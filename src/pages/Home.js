@@ -5,20 +5,22 @@ import { useNavigate } from "react-router-dom";
 import home1 from '../image/home1.jpg';
 import home2 from '../image/home2.jpg';
 import home3 from '../image/home3.jpg';
+import home5 from '../image/home5.jpg';
 import Giltshflarecard from '../image/Giltshflarecard.jpg';
 import BlazeGazeecard from '../image/BlazeGazecard.jpg';
 import KYNcard from '../image/KYNcard.jpg';
 import RebelAngelcard from '../image/RebelAngelcard.jpg';
+import Giltshflare4 from '../image/Giltshflare4.jpg';
 export default function Home() {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
   const [hovered, setHovered] = useState(null);
   const [showSplash, setShowSplash] = useState(true);
   const brandCards = [
-    { id: 1, name: "", image: home1, description: "", rotate: -8, y: 0, scale: 0.92 },
+    { id: 1, name: "", image: Giltshflare4, description: "", rotate: -8, y: 0, scale: 0.92 },
     { id: 2, name: "", image: home2, description: "", rotate: 4, y: 15, scale: 0.95 },
     { id: 3, name: "", image: home3, description: "", rotate: -3, y: 30, scale: 0.98 },
-    { id: 4, name: "", image: home1, description: "", rotate: 2, y: 45, scale: 1 },
+    { id: 4, name: "", image: home5, description: "", rotate: 2, y: 45, scale: 1 },
   ];
   const products = [
      { id: 401, name: "Giltsh Flare", price: "999 EGP", originalPrice: "1400 EGP", image: Giltshflarecard, category: "knitted-sweaters", description: "Giltsh Flare by KYN – Shine Different" },

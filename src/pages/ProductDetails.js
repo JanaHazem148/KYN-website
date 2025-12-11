@@ -1,4 +1,4 @@
-// src/pages/ProductDetails.jsx - Final Version + Size Chart Added
+// src/pages/ProductDetails.jsx - Final Version + Size Chart + Swipe Navigation + Pre-Order Price Fix
 
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -13,14 +13,21 @@ import Giltshflare4 from '../image/Giltshflare4.jpg';
 import Giltshflare5 from '../image/Giltshflare5.jpg';
 import BlazeGaze1 from '../image/BlazeGaze1.jpg';
 import BlazeGaze2 from '../image/BlazeGaze2.jpg';
+import BlazeGaze3 from '../image/BlazeGaze3.jpg';
+import BlazeGaze4 from '../image/BlazeGaze4.jpg';
 import BlazeGazeecard from '../image/BlazeGazecard.jpg';
 import KYNcard from '../image/KYNcard.jpg';
 import KYN1 from '../image/KYN1.jpg';
+import KYN2 from '../image/KYN2.jpg';
 import home2 from '../image/home2.jpg';
 import RebelAngelcard from '../image/RebelAngelcard.jpg';
 import RebelAngel2 from '../image/RebelAngel2.jpg';
 import RebelAngel3 from '../image/RebelAngel3.jpg';
 import RebelAngel4 from '../image/RebelAngel4.jpg';
+import Antigravirycard from '../image/Antigravirycard.jpg';
+import Antigraviry1 from '../image/Antigravity1.jpg';
+import Antigraviry2 from '../image/Antigravity2.jpg';
+import Antigraviry3 from '../image/Antigravity3.jpg';
 
 const allProducts = [
   {
@@ -43,7 +50,7 @@ const allProducts = [
     description: "Blaze Gaze is the sweater you throw on when you want to look good without even trying...",
     colors: ["#ffffffff"],
     sizes: ["M", "L"],
-    images: [BlazeGazeecard, BlazeGaze1, BlazeGaze2],
+    images: [BlazeGazeecard, BlazeGaze1, BlazeGaze2 ,BlazeGaze3 ,BlazeGaze4],
     soldOut: false
   },
   {
@@ -54,18 +61,29 @@ const allProducts = [
     description: "KYN is the go-to sweater for your everyday vibe...",
     colors: ["#0c9adbff"],
     sizes: ["M", "L"],
-    images: [KYNcard, KYN1, home2],
-    soldOut: false
+    images: [KYNcard, KYN1, home2 ,KYN2],
+    soldOut: true
   },
   {
     id: 201,
     name: "Rebel Angel",
     price: "999 EGP",
     originalPrice: "1400 EGP",
-    description: "Rebel Angel by KYN brings a bold mix of innocence and chaos...",
+    description: "Everyone thinks angels are gentle… until they meet the one holding the gun. Rebel Angel – the sweater for those who pray in silence and shoot in noise",
     colors: ["#000000ff"],
-    sizes: ["M", "L"],
+    sizes: ["M", "L" ,"XL"],
     images: [RebelAngelcard, RebelAngel2, RebelAngel3, RebelAngel4],
+    soldOut: false
+  },
+  {
+    id: 301,
+    name: "Anti Gravity",
+    price: "999 EGP",
+    originalPrice: "1400 EGP",
+    description: "Rebel Angel by KYN brings a bold mix of innocence and chaos...",
+    colors: ["#6f6f6f"],
+    sizes: ["S","M", "L" ,"XL"],
+    images: [Antigravirycard, Antigraviry1, Antigraviry2, Antigraviry3],
     soldOut: false
   },
 ];
@@ -76,7 +94,7 @@ export default function ProductDetails() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
-  const [mainImage, setMainImage] = useState("");
+  const [mainImageIndex, setMainImageIndex] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
   const { addToCart } = useCart();
 
@@ -84,10 +102,10 @@ export default function ProductDetails() {
   const productImages = product?.images || [];
 
   useEffect(() => {
-    if (product) {
+    if (product && productImages.length > 0) {
       setSelectedColor(product.colors[0]);
       setSelectedSize(product.sizes[0]);
-      setMainImage(productImages[0]);
+      setMainImageIndex(0);
     }
   }, [product, productImages]);
 
@@ -96,6 +114,14 @@ export default function ProductDetails() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const goToNextImage = () => {
+    setMainImageIndex((prev) => (prev + 1) % productImages.length);
+  };
+
+  const goToPrevImage = () => {
+    setMainImageIndex((prev) => (prev - 1 + productImages.length) % productImages.length);
+  };
 
   const handleAddToCart = () => {
     if (!selectedSize) {
@@ -111,7 +137,7 @@ export default function ProductDetails() {
       selectedColor,
       selectedSize,
       quantity: 1,
-      mainImage,
+      mainImage: productImages[mainImageIndex],
       isPreOrder: product.soldOut,
       price: `${finalPrice} EGP`,
       displayPrice: product.soldOut ? `${finalPrice} EGP (50% Pre-Order)` : `${finalPrice} EGP`
@@ -139,7 +165,9 @@ export default function ProductDetails() {
   }
 
   const basePrice = parseFloat(product.price.replace(" EGP", ""));
-  const displayedPrice = product.soldOut ? Math.round(basePrice * 0.5) : basePrice;
+  const displayedPrice = product.soldOut ? basePrice : basePrice; // دايمًا السعر الأصلي في الـ UI
+
+  const mainImage = productImages[mainImageIndex];
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#000", color: "#fff", padding: "90px 20px 60px" }}>
@@ -165,7 +193,7 @@ export default function ProductDetails() {
               border: "3px solid #000"
             }}
           >
-            {product.soldOut ? "Pre-Order (50%) Added Successfully!" : "Added to cart successfully!"}
+            {product.soldOut ? "Pre-Order  Added Successfully!" : "Added to cart successfully!"}
           </motion.div>
         )}
       </AnimatePresence>
@@ -184,13 +212,25 @@ export default function ProductDetails() {
           {/* Images Section */}
           <div>
             <motion.div
-              key={mainImage}
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              style={{ borderRadius: "28px", overflow: "hidden", boxShadow: "0 30px 80px rgba(0,0,0,0.9)", marginBottom: "30px" }}
+              drag={productImages.length > 1 ? "x" : false}
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.2}
+              onDragEnd={(e, { offset }) => {
+                if (offset.x > 100) goToPrevImage();
+                else if (offset.x < -100) goToNextImage();
+              }}
+              style={{ cursor: productImages.length > 1 ? "grab" : "default" }}
+              whileDrag={{ cursor: "grabbing" }}
             >
-              <img src={mainImage} alt={product.name} style={{ width: "100%", height: "auto", display: "block" }} />
+              <motion.div
+                key={mainImage}
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                style={{ borderRadius: "28px", overflow: "hidden", boxShadow: "0 30px 80px rgba(0,0,0,0.9)", marginBottom: "30px" }}
+              >
+                <img src={mainImage} alt={product.name} style={{ width: "100%", height: "auto", display: "block" }} />
+              </motion.div>
             </motion.div>
 
             <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", justifyContent: "center" }}>
@@ -199,15 +239,15 @@ export default function ProductDetails() {
                   key={i}
                   whileHover={{ scale: 1.12 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setMainImage(img)}
+                  onClick={() => setMainImageIndex(i)}
                   style={{
                     width: isMobile ? "90px" : "120px",
                     height: isMobile ? "90px" : "120px",
                     borderRadius: "18px",
                     overflow: "hidden",
                     cursor: "pointer",
-                    border: mainImage === img ? "5px solid #fff" : "3px solid #333",
-                    boxShadow: mainImage === img ? "0 0 35px rgba(255,255,255,0.7)" : "0 8px 25px rgba(0,0,0,0.6)"
+                    border: mainImageIndex === i ? "5px solid #fff" : "3px solid #333",
+                    boxShadow: mainImageIndex === i ? "0 0 35px rgba(255,255,255,0.7)" : "0 8px 25px rgba(0,0,0,0.6)"
                   }}
                 >
                   <img src={img} alt={`View ${i + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -279,8 +319,8 @@ export default function ProductDetails() {
                   </span>
                 )}
                 {product.soldOut && (
-                  <div style={{ fontSize: "1.4rem", color: "#ff3366", marginTop: "10px", fontWeight: "bold" }}>
-                    50% Now • Rest on Delivery
+                  <div style={{ fontSize: "1.5rem", color: "#ff3366", marginTop: "15px", fontWeight: "bold" }}>
+                   We'll notify you as soon as it's back in stock
                   </div>
                 )}
               </div>
@@ -340,48 +380,26 @@ export default function ProductDetails() {
 
               {/* Action Buttons */}
               <div style={{ display: "flex", gap: "25px", flexWrap: "wrap", marginBottom: "80px" }}>
-                {!product.soldOut ? (
-                  <motion.button
-                    whileHover={{ scale: 1.06, backgroundColor: "#000", color: "#fff" }}
-                    whileTap={{ scale: 0.94 }}
-                    onClick={handleAddToCart}
-                    style={{
-                      flex: 1,
-                      padding: "26px",
-                      background: "#fff",
-                      color: "#000",
-                      border: "none",
-                      borderRadius: "20px",
-                      fontSize: "1.6rem",
-                      fontWeight: "bold",
-                      transition: "all 0.3s ease",
-                      cursor: "pointer"
-                    }}
-                  >
-                    Add to Cart
-                  </motion.button>
-                ) : (
-                  <motion.button
-                    whileHover={{ scale: 1.04, backgroundColor: "#ff3366" }}
-                    whileTap={{ scale: 0.96 }}
-                    onClick={handleAddToCart}
-                    style={{
-                      flex: 1,
-                      padding: "26px",
-                      background: "#ff0055",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "20px",
-                      fontSize: "1.6rem",
-                      fontWeight: "bold",
-                      boxShadow: "0 12px 35px rgba(255,0,85,0.4)",
-                      transition: "all 0.3s ease",
-                      cursor: "pointer"
-                    }}
-                  >
-                    Pre-Order (50% Now)
-                  </motion.button>
-                )}
+                <motion.button
+                  whileHover={{ scale: 1.04, backgroundColor: "#ff3366" }}
+                  whileTap={{ scale: 0.96 }}
+                  onClick={handleAddToCart}
+                  style={{
+                    flex: 1,
+                    padding: "26px",
+                    background: product.soldOut ? "#ff0055" : "#f9f9f9ff",
+                    color: "#000000ff",
+                    border: "none",
+                    borderRadius: "20px",
+                    fontSize: "1.6rem",
+                    fontWeight: "bold",
+                    boxShadow: product.soldOut ? "0 12px 35px rgba(255,0,85,0.4)" : "none",
+                    transition: "all 0.3s ease",
+                    cursor: "pointer"
+                  }}
+                >
+                  {product.soldOut ? "Pre-Order " : "Add to Cart"}
+                </motion.button>
 
                 <motion.button
                   whileHover={{ scale: 1.06, backgroundColor: "rgba(255,255,255,0.1)" }}
@@ -401,62 +419,156 @@ export default function ProductDetails() {
                 </motion.button>
               </div>
 
-              {/* Size Chart Table - جدول المقاسات الجديد */}
-              <div style={{
-                background: "rgba(255,255,255,0.05)",
-                border: "2px solid rgba(255,255,255,0.2)",
-                borderRadius: "24px",
-                padding: "30px",
-                backdropFilter: "blur(10px)",
-                boxShadow: "0 20px 50px rgba(0,0,0,0.7)"
-              }}>
-                <h3 style={{
-                  fontSize: "2rem",
-                  fontWeight: "bold",
-                  marginBottom: "20px",
-                  textAlign: "center",
-                  background: "linear-gradient(45deg, #fff, #ccc)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent"
-                }}>
-                  Size Guide (cm)
-                </h3>
-                <div style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr 1fr",
-                  gap: "0",
-                  border: "2px solid rgba(255,255,255,0.3)",
-                  borderRadius: "16px",
-                  overflow: "hidden",
-                  fontSize: "1.4rem",
-                  fontWeight: "bold"
-                }}>
-                  {/* Header */}
-                  <div style={{ background: "#111", padding: "20px", textAlign: "center", borderBottom: "2px solid rgba(255,255,255,0.2)" }}>Size</div>
-                  <div style={{ background: "#111", padding: "20px", textAlign: "center", borderBottom: "2px solid rgba(255,255,255,0.2)" }}>Length</div>
-                  <div style={{ background: "#111", padding: "20px", textAlign: "center", borderBottom: "2px solid rgba(255,255,255,0.2)" }}>Width</div>
+{/* 🔥 Wrapper يخلي الاتنين جنب بعض */}
+<div style={{
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "flex-start",
+  gap: "30px",
+  marginTop: "40px",
+  flexWrap: "wrap"
+}}>
 
-                  {/* M */}
-                  <div style={{ background: "rgba(255,255,255,0.05)", padding: "18px", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>M</div>
-                  <div style={{ background: "rgba(255,255,255,0.05)", padding: "18px", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>64</div>
-                  <div style={{ background: "rgba(255,255,255,0.05)", padding: "18px", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>61</div>
+  {/* ===================== SIZE GUIDE ===================== */}
+  <div style={{
+    flex: "1",
+    minWidth: "330px",
+    background: "rgba(255,255,255,0.03)",
+    border: "1.5px solid rgba(0,255,200,0.25)",
+    borderRadius: "20px",
+    padding: "25px",
+    boxShadow: "0 0 20px rgba(0, 255, 200, 0.2)",
+    backdropFilter: "blur(10px)"
+  }}>
+    <h3 style={{
+      fontSize: "2rem",
+      fontWeight: "bold",
+      textAlign: "center",
+      marginBottom: "15px",
+      color: "#00ffe1",
+      letterSpacing: "2px",
+      textShadow: "0 0 10px #00ffe1"
+    }}>
+      Size Guide (cm)
+    </h3>
 
-                  {/* L */}
-                  <div style={{ background: "rgba(255,255,255,0.03)", padding: "18px", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>L</div>
-                  <div style={{ background: "rgba(255,255,255,0.03)", padding: "18px", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>66</div>
-                  <div style={{ background: "rgba(255,255,255,0.03)", padding: "18px", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>64</div>
+    <div style={{
+      width: "100%",
+      borderRadius: "14px",
+      overflow: "hidden",
+      border: "1px solid rgba(255,255,255,0.2)"
+    }}>
 
-                  {/* XL */}
-                  <div style={{ padding: "18px", textAlign: "center" }}>XL</div>
-                  <div style={{ padding: "18px", textAlign: "center" }}>70</div>
-                  <div style={{ padding: "18px", textAlign: "center" }}>68</div>
-                </div>
-              </div>
+      {/* Header */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr 1fr",
+        background: "rgba(0,255,200,0.15)",
+        padding: "15px 0",
+        color: "#fff",
+        fontWeight: "bold",
+        fontSize: "1.2rem",
+        textAlign: "center"
+      }}>
+        <div>Size</div>
+        <div>Length</div>
+        <div>Width</div>
+      </div>
+
+      {/* Rows */}
+      {[
+        ["S", 61, 58],
+        ["M", 64, 61],
+        ["L", 66, 64],
+        ["XL", 70, 68],
+        ["XXL", 73, 71]
+      ].map((row, i) => (
+        <div
+          key={i}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr 1fr",
+            padding: "14px 0",
+            background: i % 2 === 0 ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.02)",
+            color: "#eee",
+            fontSize: "1.1rem",
+            textAlign: "center",
+            borderBottom: "1px solid rgba(255,255,255,0.1)"
+          }}
+        >
+          <div>{row[0]}</div>
+          <div>{row[1]}</div>
+          <div>{row[2]}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+
+  {/* ===================== WASHING INSTRUCTIONS ===================== */}
+  <div style={{
+    flex: "1",
+    minWidth: "330px",
+    background: "rgba(255,255,255,0.03)",
+    border: "1.5px solid rgba(255,255,255,0.15)",
+    borderRadius: "20px",
+    padding: "25px",
+    boxShadow: "0 0 25px rgba(255,255,255,0.15)",
+    backdropFilter: "blur(10px)"
+  }}>
+    <h3 style={{
+      fontSize: "2rem",
+      fontWeight: "bold",
+      textAlign: "center",
+      marginBottom: "20px",
+      color: "#fff",
+      letterSpacing: "2px",
+      textShadow: "0 0 8px #fff"
+    }}>
+      Washing<br />Instructions
+    </h3>
+
+    <ul style={{
+      listStyle: "none",
+      padding: "0",
+      margin: "0",
+      display: "flex",
+      flexDirection: "column",
+      gap: "12px",
+      fontSize: "1.2rem",
+      color: "rgba(255,255,255,0.85)"
+    }}>
+      <li style={{ borderLeft: "3px solid #00ffe1", paddingLeft: "12px" }}>
+        Turn t-shirt inside-out before washing it
+      </li>
+
+      <li style={{ borderLeft: "3px solid #00ffe1", paddingLeft: "12px" }}>
+        Wash it on a gentle cycle
+      </li>
+
+      <li style={{ borderLeft: "3px solid #00ffe1", paddingLeft: "12px" }}>
+        Wash at low temperature, preferably cold water
+      </li>
+
+    <li style={{ borderLeft: "3px solid #00ffe1", paddingLeft: "12px" }}>
+        Iron the t-shirt inside-out — never iron directly on the print
+      </li>
+    </ul>
+  </div>
+  {/* closing الـ Washing Instructions */}
+
+</div>
+{/* closing الـ Wrapper بتاع Size Guide & Washing Instructions */}
 
             </motion.div>
+            {/* closing الـ Details Section motion.div */}
           </div>
+          {/* closing الـ Details Section div */}
         </motion.div>
+        {/* closing الـ grid الرئيسي */}
       </div>
+     
     </div>
+   
   );
 }

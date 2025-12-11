@@ -7,6 +7,7 @@ import Giltshflarecard from '../image/Giltshflarecard.jpg';
 import BlazeGazeecard from '../image/BlazeGazecard.jpg';
 import KYNcard from '../image/KYNcard.jpg';
 import RebelAngelcard from '../image/RebelAngelcard.jpg';
+import Antigravirycard from '../image/Antigravirycard.jpg';
 
 export default function Products() {
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ export default function Products() {
     { id: 402, name: "Blaze Gaze", price: "999 EGP", originalPrice: "1400 EGP", image: BlazeGazeecard, category: "knitted-sweaters", description: "Blaze Gaze by KYN – Ignite Your Look" },
     { id: 101, name: "KYN – Made Different", price: "999 EGP", originalPrice: "1400 EGP", image: KYNcard, category: "knitted-sweaters", description: "KYN – Made Different" },
     { id: 201, name: "Rebel Angel", price: "999 EGP", originalPrice: "1400 EGP", image: RebelAngelcard, category: "knitted-sweaters", description: "Rebel Angel by KYN – Break the Halo." },
+    { id: 301, name: "Antigravity", price: "999 EGP", originalPrice: "1400 EGP", image: Antigravirycard, category: "knitted-sweaters", description: "Antigravity by KYN – Defy the Ordinary" }
   ], []);
 
   const categories = [

@@ -1,37 +1,40 @@
+// src/App.jsx
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Home from './pages/Home';
 import Product from './pages/Product';
 import ProductDetails from './pages/ProductDetails';
 import Contact from './pages/Contact';
 import About from './pages/About';
-import Cart from './pages/Cart'; // لو الصفحة مش موجودة احذف السطر ده
+
+
 
 function App() {
   return (
     <Router>
-      <div className="App">
+      <div className="App" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+        {/* Navbar ثابت في الأعلى */}
         <Navbar />
 
-        <Routes>
-          {/* الصفحة الافتراضية */}
-          <Route path="/" element={<Home />} />
+        {/* كل المحتوى بتاع الصفحات */}
+        <main style={{ flex: 1 }}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/product" element={<Product />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/about" element={<About />} />
 
-          {/* باقي الروابط */}
-          <Route path="/product" element={<Product />} />
-          <Route path="/product/:id" element={<ProductDetails />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/About" element={<About />} />
-          
-          {/* صفحة السلة - احذف السطر ده لو الصفحة مش موجودة */}
-          <Route path="/cart" element={<Cart />} />
+            {/* أي رابط غلط يرجع للـ Home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
 
-          {/* أي لينك مش موجود → يرجع على الـ Home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-          {/* أو لو عايز تعرض الـ Home فعليًا مش مجرد ريدايركت */}
-          {/* <Route path="*" element={<Home />} /> */}
-        </Routes>
+        {/* الفوتر هنا هيظهر في كل الصفحات */}
+        <Footer />
       </div>
     </Router>
   );
